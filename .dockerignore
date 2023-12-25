@@ -1,0 +1,8 @@
+**/README.md
+**/__pycache__
+**/.idea
+**/.DS_Store
+**/.pytest_cache
+*.pyc
+*.pyo
+*.pyd

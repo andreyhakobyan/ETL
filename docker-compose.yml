@@ -1,0 +1,96 @@
+version: '3.9'
+
+services:
+  postgres:
+    container_name: postgres_container
+    image: postgres:14-alpine
+    ports:
+      - 5432:5432
+    # volumes:
+    #   - postgres:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DATABASE: ${POSTGRES_DATABASE}
+      PGDATA: /var/lib/postgresql/data/pgdata
+    networks:
+      - mynetwork
+    restart: unless-stopped
+    logging:
+      options:
+        max-file: "5"
+        max-size: "20m"
+
+  mysql:
+    container_name: mysql_container
+    image: mysql:8.0
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+    ports:
+      - 3306:3306
+    networks:
+      - mynetwork
+    restart: unless-stopped
+    logging:
+      options:
+        max-file: "5"
+        max-size: "20m"
+
+  grafana:
+    container_name: grafana_container
+    image: grafana/grafana:9.5.12
+    ports:
+      - 3000:3000
+    environment:
+      GF_SECURITY_ADMIN_USER: ${GF_SECURITY_ADMIN_USER}
+      GF_SECURITY_ADMIN_PASSWORD: ${GF_SECURITY_ADMIN_PASSWORD}
+    volumes:
+      - ./configs/grafana/grafana.ini:/etc/grafana/grafana.ini:ro
+      - ./configs/grafana/datasources.yaml:/etc/grafana/provisioning/datasources/datasource.yaml:ro
+      - ./configs/grafana/dashboard.yaml:/etc/grafana/provisioning/dashboards/dashboard.yaml
+      - ./configs/grafana/dashboards:/var/lib/grafana/dashboards
+      # - grafana_data:/var/lib/grafana
+    depends_on:
+      - app
+      - mysql
+      - postgres
+    networks:
+      - mynetwork
+
+  app:
+    container_name: app_container
+    build: .
+    depends_on:
+      - mysql
+      - postgres
+    environment:
+      MYSQL_HOST: ${MYSQL_HOST}
+      MYSQL_ROOT_USER: ${MYSQL_ROOT_USER}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_PORT: ${MYSQL_PORT}
+      
+      POSTGRES_HOST: ${POSTGRES_HOST}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DATABASE: ${POSTGRES_DATABASE}
+      POSTGRES_SCHEMA: ${POSTGRES_SCHEMA}
+      POSTGRES_PORT: ${POSTGRES_PORT}
+    networks:
+      - mynetwork
+    logging:
+      options:
+        max-file: "5"
+        max-size: "20m"
+
+
+# volumes:
+#   grafana_data:
+#   postgres:
+
+networks:
+  mynetwork:
