@@ -9,7 +9,7 @@ Columns:
 * updatedAt: A timestamp indicating when the attendee record was last updated.
 * joinDate: A text field that likely stores the date when the attendee joined the session.
 * leftDate: A text field that likely stores the date when the attendee left the session.
-* parentSpaceSessionId: A reference to another space session (possibly a parent session).
+* parentSpaceSessionId: A reference to another space session.
 * openSpaceUser: A reference to a user related to the open space.
 Relationships:
 
@@ -27,7 +27,7 @@ Columns:
 * end_date: A text field storing the end date and time of the session.
 * createdAt: A timestamp indicating when the session record was created.
 * updatedAt: A timestamp indicating when the session record was last updated.
-* roomSid: A text field, possibly related to session details.  
+* roomSid: A text field, related to session details.  
 
 Relationships:  
 `spaceId` likely serves as a foreign key linking this table to the space table (not provided).
